@@ -1,0 +1,45 @@
+# Arduino IDE generated files
+*.hex
+*.elf
+*.map
+
+# Build artifacts
+build/
+*.o
+*.a
+
+# Arduino IDE backup files
+*~
+*.bak
+*.tmp
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Documentation build
+docs/_build/
+
+# Python files (if using any scripts)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Log files
+*.log
+
+# Arduino Libraries (if locally installed)
+libraries/*/
+!libraries/README.md
