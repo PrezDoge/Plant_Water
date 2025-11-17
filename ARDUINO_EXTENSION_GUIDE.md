@@ -58,8 +58,7 @@ Arduino: Select Sketch              # Switch between .ino files
 - **examples/sensor_calibration.ino** - Test moisture sensors
 - **examples/pump_test.ino** - Test motor/pump operation
 
-#### **Simulation:**
-- **plant_water_pc_simulation.cpp** - PC testing (use with g++ compiler)
+
 
 ### **🔍 IntelliSense Features Now Working:**
 
@@ -107,13 +106,11 @@ Arduino: Select Sketch              # Switch between .ino files
 
 #### **Development Workflow:**
 1. **Write code** in VS Code with full IntelliSense
-2. **Test logic** using PC simulation first
-3. **Upload to Arduino** when ready
-4. **Monitor via Serial** for debugging
+2. **Upload to Arduino** and test with hardware
+3. **Monitor via Serial** for debugging
 
 #### **Testing Strategy:**
-1. **PC Simulation** - Test logic without hardware
-2. **Basic Arduino** - Test core functionality  
-3. **Full System** - Test with Bluetooth integration
+1. **Basic Arduino** - Test core functionality with hardware 
+2. **Full System** - Test with Bluetooth integration
 
 **Your Arduino project is now fully configured for professional development in VS Code!** 🎯⚡
