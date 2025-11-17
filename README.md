@@ -1,14 +1,6 @@
-# Plant Watering System - Arduino IoT Project
-
-[![Arduino](https://img.shields.io/badge/Arduino-Compatible-00979D?logo=arduino&logoColor=white)](https://arduino.cc)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![C++](https://img.shields.io/badge/C++-11-blue.svg)](https://isocpp.org)
-[![Platform](https://img.shields.io/badge/Platform-Arduino%20Uno-red.svg)](https://store.arduino.cc/products/arduino-uno-rev3)
-
 ## 🌱 **Automated Plant Watering System with Bluetooth Interface**
 
-An intelligent Arduino-based plant watering system that uses dual moisture sensors and native Bluetooth popup interface for monitoring and control. Perfect for keeping your plants healthy while you're away!
-
+An intelligent Arduino-based plant watering system that uses dual moisture sensors and native Bluetooth popup interface for monitoring and control.
 ## Features
 
 - **Dual Sensor Monitoring**: Two moisture sensors (3.3V and 5V) for redundancy
@@ -23,13 +15,13 @@ An intelligent Arduino-based plant watering system that uses dual moisture senso
 ## 🔵 Two Operation Modes
 
 ### **Bluetooth Popup Interface** (Recommended)
-- **File**: `plant_water_bluetooth_popup.ino`
+- **File**: `plant_water.ino`
 - **Interface**: Native phone Bluetooth popups and notifications
 - **Setup**: Pair with device, follow popup menus
 - **Features**: Smart device names, automatic notifications, simple configuration
 
 ### **Basic Serial Mode**
-- **File**: `plant_water.ino`
+- **File**: `plant_water_basic.ino`
 - **Interface**: Arduino IDE Serial Monitor
 - **Setup**: Upload code and use serial commands
 - **Features**: Serial configuration, manual controls
@@ -43,8 +35,6 @@ An intelligent Arduino-based plant watering system that uses dual moisture senso
 - LM2596 Buck Converter (3V-40V input, 1.25V-35V output)
 - DC Mini Motor (1.5V-6V, 0.4A-0.55A capacity)
 - Nordic nRF52840 Bluetooth module
-- Push button
-- LED (optional - can use built-in LED)
 - Breadboard and jumper wires
 - Water reservoir and tubing
 
@@ -68,7 +58,7 @@ An intelligent Arduino-based plant watering system that uses dual moisture senso
 2. Select board: **Arduino Uno**
 3. Select correct COM port
 4. Choose your version:
-   - **Bluetooth Popup Interface**: Upload `plant_water.ino` (recommended)
+   - **Bluetooth Popup Interface**: Upload `plant_water_bluetooth_popup.ino` (recommended)
    - **Basic Serial**: Upload `plant_water_basic.ino`
 
 ### Dependencies
