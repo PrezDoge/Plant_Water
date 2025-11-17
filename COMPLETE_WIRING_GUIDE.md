@@ -27,11 +27,11 @@ Your diagram shows the basic sensor connections to the SparkFun RedBoard:
 | DRV8871 IN2 | Pin 8 | Green | Motor direction 2 |
 | DRV8871 VCC | 5V | Red | Power supply |
 | DRV8871 GND | GND | Black | Ground |
-| **Bluetooth Module (nRF52840)** |
-| nRF52840 TX | Pin 4 | Orange | Arduino RX |
-| nRF52840 RX | Pin 5 | Purple | Arduino TX |
-| nRF52840 VCC | 3.3V | Red | 3.3V power |
-| nRF52840 GND | GND | Black | Ground |
+| **SparkFun Pro nRF52840 Mini** |
+| SparkFun nRF52840 TX | Pin 4 | Orange | Arduino RX |
+| SparkFun nRF52840 RX | Pin 5 | Purple | Arduino TX |
+| SparkFun nRF52840 VCC | 3.3V | Red | 3.3V power |
+| SparkFun nRF52840 GND | GND | Black | Ground |
 | **Status Indicator** |
 | Status LED | Pin 13 | - | Built-in LED |
 
@@ -47,12 +47,12 @@ DRV8871 VCC → 5V (or higher for motor)
 DRV8871 GND → Common Ground
 ```
 
-### **Bluetooth Module (nRF52840)**
+### **SparkFun Pro nRF52840 Mini**
 ```
-RedBoard Pin 4 → nRF52840 RX
-RedBoard Pin 5 → nRF52840 TX  
-RedBoard 3.3V → nRF52840 VCC
-RedBoard GND → nRF52840 GND
+RedBoard Pin 4 → SparkFun nRF52840 RX
+RedBoard Pin 5 → SparkFun nRF52840 TX  
+RedBoard 3.3V → SparkFun nRF52840 VCC
+RedBoard GND → SparkFun nRF52840 GND
 ```
 
 
@@ -63,7 +63,7 @@ RedBoard GND → nRF52840 GND
 - **RedBoard**: 5V via USB or barrel jack
 - **3.3V Sensor**: 3.3V from RedBoard 3.3V pin
 - **5V Sensor**: 5V from RedBoard 5V pin
-- **nRF52840**: 3.3V (do not use 5V!)
+- **SparkFun nRF52840**: 3.3V (do not use 5V!)
 - **DRV8871**: 6.5V-45V (use external power for motor)
 - **DC Motor**: 1.5V-6V (through H-bridge)
 
@@ -85,7 +85,7 @@ Power Rails:
 - Side rail: 3.3V (from RedBoard)
 
 Component Placement:
-- nRF52840: Left side of breadboard
+- SparkFun nRF52840 Mini: Left side of breadboard
 - DRV8871: Right side of breadboard
 - Sensors: Connect via jumper wires to soil
 ```
@@ -107,7 +107,7 @@ Component Placement:
 3. Provide appropriate power supply to H-bridge
 
 ### **Step 3: Add Bluetooth Module**
-1. Connect nRF52840 to pins 4 and 5
+1. Connect SparkFun nRF52840 Mini to pins 4 and 5
 2. **Important**: Use 3.3V power, not 5V!
 3. Connect common ground
 
@@ -143,7 +143,7 @@ Component Placement:
 
 ### **Electrical Safety**
 - **Double-check voltage levels** before connecting
-- **nRF52840 is 3.3V only** - 5V will damage it!
+- **SparkFun nRF52840 is 3.3V only** - 5V will damage it!
 - **Isolate motor power** from logic power
 - **Use fuses** on high-current connections
 
@@ -165,9 +165,24 @@ Component Placement:
 - Test H-bridge with LED first
 
 ### **Bluetooth Not Connecting**
-- Verify 3.3V power to nRF52840
-- Check TX/RX connections (crossed correctly)
+- Verify 3.3V power to SparkFun nRF52840
+- Check TX/RX connections (crossed correctly)  
 - Ensure common ground connection
+
+## 🌟 **SparkFun Pro nRF52840 Mini Advantages**
+
+### **Why This Board is Perfect for Your Project:**
+- ✅ **USB-C Programming** - No external programmer needed
+- ✅ **Built-in 3.3V Regulator** - Clean power, no external components
+- ✅ **Arduino IDE Support** - Program like regular Arduino
+- ✅ **Professional PCB** - Reliable connections and proper layout
+- ✅ **SparkFun Quality** - Excellent documentation and support
+- ✅ **Debugging Features** - Serial monitor via USB-C
+- ✅ **Compact Design** - Perfect for breadboard prototyping
+
+### **Programming Options:**
+1. **As Bluetooth Module** (Current design) - Use with Arduino as main controller
+2. **As Main Controller** (Advanced) - Replace Arduino entirely for single-board solution
 
 ---
 

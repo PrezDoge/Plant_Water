@@ -2,7 +2,7 @@
 
 ## 🎯 Overview
 
-This system uses the Nordic nRF52840's Bluetooth capabilities to create **native phone popups and notifications** for plant system configuration - **no app installation required!**
+This system uses the SparkFun Pro nRF52840 Mini's Bluetooth capabilities to create **native phone popups and notifications** for plant system configuration - **no app installation required!**
 
 ## 📱 How It Works
 
@@ -191,7 +191,7 @@ MENU:Options       → Menu display
 ### **Device Not Found**
 - **Reset Arduino** and wait 30 seconds
 - **Clear Bluetooth cache** on phone
-- **Check nRF52840 connections**
+- **Check SparkFun nRF52840 connections**
 
 ### **Commands Not Working**
 - **Use Bluetooth terminal app** for reliable messaging

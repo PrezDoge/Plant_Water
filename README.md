@@ -34,9 +34,16 @@ An intelligent Arduino-based plant watering system that uses dual moisture senso
 - DRV8871 H-Bridge motor driver (6.5V-45V, 3.6A capacity)
 - LM2596 Buck Converter (3V-40V input, 1.25V-35V output)
 - DC Mini Motor (1.5V-6V, 0.4A-0.55A capacity)
-- Nordic nRF52840 Bluetooth module
-- Breadboard and jumper wires
+- SparkFun Pro nRF52840 Mini Bluetooth Development Board
+- Breadboard and jumper wires  
 - Water reservoir and tubing
+
+### SparkFun Pro nRF52840 Mini Benefits
+- **USB-C Programming**: Direct programming via Arduino IDE
+- **Built-in Voltage Regulation**: Clean 3.3V power management
+- **Professional PCB**: Reliable connections and debugging
+- **SparkFun Documentation**: Excellent tutorials and support
+- **Arduino IDE Compatible**: Easy development workflow
 
 ### Pin Connections
 
@@ -46,8 +53,8 @@ An intelligent Arduino-based plant watering system that uses dual moisture senso
 | 5V Moisture Sensor | A1 | Analog input |
 | DRV8871 H-Bridge (IN1) | Pin 7 | Motor control |
 | DRV8871 H-Bridge (IN2) | Pin 8 | Motor control |
-| nRF52840 Bluetooth (TX) | Pin 4 | SoftwareSerial |
-| nRF52840 Bluetooth (RX) | Pin 5 | SoftwareSerial |
+| SparkFun nRF52840 (TX) | Pin 4 | SoftwareSerial |
+| SparkFun nRF52840 (RX) | Pin 5 | SoftwareSerial |
 | Manual Override Button | Pin 2 | Digital input with pull-up |
 | Status LED | Pin 13 | Built-in LED |
 

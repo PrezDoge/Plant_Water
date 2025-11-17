@@ -10,7 +10,7 @@
  * - Dual moisture sensors (3.3V + 5V)
  * - DRV8871 H-Bridge motor controller
  * - LM2596 Buck Converter
- * - Nordic nRF52840 Bluetooth module
+ * - SparkFun Pro nRF52840 Mini Bluetooth Development Board
  * 
  * Features:
  * - Bluetooth device name shows current status
@@ -29,9 +29,9 @@ const int MOTOR_IN1_PIN = 7;
 const int MOTOR_IN2_PIN = 8;
 const int LED_PIN = 13;
 
-// Bluetooth pins
-const int BLUETOOTH_TX_PIN = 4;
-const int BLUETOOTH_RX_PIN = 5;
+// SparkFun Pro nRF52840 Mini pins
+const int BLUETOOTH_TX_PIN = 4;  // Connect to nRF52840 RX
+const int BLUETOOTH_RX_PIN = 5;  // Connect to nRF52840 TX
 SoftwareSerial bluetooth(BLUETOOTH_RX_PIN, BLUETOOTH_TX_PIN);
 
 // Configuration variables
