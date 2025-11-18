@@ -6,7 +6,7 @@
  * For web-based configuration interface, use plant_water_webconfig.ino
  * 
  * Hardware:
- * - SparkFun RedBoard (DEV-13975)
+ * - SparkFun RedBoard (DEV-15025)
  * - Dual moisture sensors (3.3V + 5V)
  * - DRV8871 H-Bridge motor controller
  * - LM2596 Buck Converter

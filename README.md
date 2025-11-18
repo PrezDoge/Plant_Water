@@ -29,7 +29,7 @@ An intelligent Arduino-based plant watering system that uses dual moisture senso
 ## Hardware Requirements
 
 ### Components
-- SparkFun RedBoard (DEV-13975) or Arduino Uno compatible
+- SparkFun RedBoard (DEV-15025) or Arduino Uno compatible
 - Two moisture sensors (3.3V and 5V versions)
 - DRV8871 H-Bridge motor driver (6.5V-45V, 3.6A capacity)
 - LM2596 Buck Converter (3V-40V input, 1.25V-35V output)

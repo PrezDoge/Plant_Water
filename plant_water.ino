@@ -2,11 +2,11 @@
  * Plant Watering System with Bluetooth Popup Interface
  * CENG 3264 Project
  * 
- * This system uses Nordic nRF52840 Bluetooth to create native phone popups
+ * This system uses SparkFun Pro nRF52840 Bluetooth to create native phone popups
  * for configuration - no app required, just Bluetooth pairing!
  * 
  * Hardware:
- * - SparkFun RedBoard (DEV-13975)
+ * - SparkFun RedBoard (DEV-15025)
  * - Dual moisture sensors (3.3V + 5V)
  * - DRV8871 H-Bridge motor controller
  * - LM2596 Buck Converter
