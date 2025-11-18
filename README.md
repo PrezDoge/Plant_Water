@@ -1,4 +1,4 @@
-## 🌱 **Automated Plant Watering System with Bluetooth Interface**
+##  **Automated Plant Watering System with Bluetooth Interface**
 
 An intelligent Arduino-based plant watering system that uses dual moisture sensors and native Bluetooth popup interface for monitoring and control.
 ## Features
@@ -12,7 +12,7 @@ An intelligent Arduino-based plant watering system that uses dual moisture senso
 - **Manual Override**: Physical button and Bluetooth controls
 - **Simple Menu System**: Number-based configuration interface
 
-## 🔵 Two Operation Modes
+##  Two Operation Modes
 
 ### **Bluetooth Popup Interface** (Recommended)
 - **File**: `plant_water.ino`
@@ -71,7 +71,7 @@ An intelligent Arduino-based plant watering system that uses dual moisture senso
 ### Dependencies
 - Arduino standard libraries only (SoftwareSerial for Bluetooth)
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### **Option 1: Bluetooth Popup Interface (Recommended)**
 1. **Upload Code**: Use `plant_water.ino`
@@ -142,17 +142,9 @@ Monitor system status through Serial Monitor at 9600 baud rate.
 
 ## Safety Notes
 
-⚠️ **Important Safety Guidelines**
+**Important Safety Guidelines**
 - Use proper relay for pump switching
 - Ensure water-resistant connections
 - Don't leave system unattended for extended periods
 - Check water reservoir regularly
 - Use appropriate power supply for pump
-
-## License
-
-This project is for educational purposes (CENG 3264 coursework).
-
-## Author
-
-Created for CENG 3264 - Embedded Systems Course
