@@ -1,33 +1,33 @@
 # Bluetooth Popup Interface Guide
 
-## 🎯 Overview
+## System Overview
 
-This system uses the SparkFun Pro nRF52840 Mini's Bluetooth capabilities to create **native phone popups and notifications** for plant system configuration - **no app installation required!**
+This system utilizes the SparkFun Pro nRF52840 Mini's Bluetooth Low Energy capabilities to create native phone popups and notifications for plant monitoring system configuration without requiring dedicated application installation.
 
-## 📱 How It Works
+## Operational Principles
 
-### **Smart Device Name**
-The Bluetooth device name dynamically updates to show current status:
-- `PlantSystem_Healthy_3V450_5V520` - System healthy, showing sensor readings
-- `PlantSystem_NeedsWater_3V650_5V720` - Plant needs watering
-- `PlantSystem_Watering_3V650_5V720` - Currently watering
+### Dynamic Device Naming Protocol
+The Bluetooth device name dynamically updates to display current system status:
+- `PlantSystem_Healthy_3V450_5V520` - System operational, displaying sensor readings
+- `PlantSystem_NeedsWater_3V650_5V720` - Irrigation required based on sensor thresholds
+- `PlantSystem_Watering_3V650_5V720` - Active irrigation cycle in progress
 
-### **Native Phone Integration**
-When you pair with the device, it triggers:
-- **System notifications** for watering events
-- **Popup dialogs** for configuration
-- **Menu-style responses** via Bluetooth messaging
-- **Input prompts** for threshold setting
+### Native Mobile Device Integration
+Device pairing triggers the following system responses:
+- System notifications for irrigation events and status changes
+- Configuration dialog boxes for parameter adjustment
+- Menu-driven interface via Bluetooth messaging protocol
+- Input prompt generation for threshold configuration
 
-## 🔧 Setup Process
+## System Configuration Process
 
-### **1. Initial Pairing**
-1. **Enable Bluetooth** on your phone
-2. **Scan for devices** - Look for "PlantSystem_..." 
-3. **Tap to pair** - This triggers the welcome popup
-4. **Follow prompts** to configure system
+### 1. Initial Device Pairing
+1. Enable Bluetooth functionality on mobile device
+2. Initiate device scan and locate "PlantSystem_..." identifier
+3. Select device for pairing to trigger welcome interface
+4. Follow configuration prompts for system parameter setup
 
-### **2. Configuration Popups**
+### 2. Configuration Interface Generation
 After pairing, you'll see:
 ```
 Plant Watering System Connected!
@@ -44,28 +44,28 @@ Configuration Options:
 Reply with number to configure
 ```
 
-### **3. Using the Interface**
-- **Send "1"** → Get prompt to set 3.3V threshold
-- **Send "3"** → Start manual watering
-- **Send "STATUS"** → Get current system status
-- **Automatic notifications** when watering starts/stops
+### 3. Interface Operation Procedures
+- Send "1" → Initiate 3.3V sensor threshold configuration
+- Send "3" → Execute manual irrigation cycle
+- Send "STATUS" → Request current system status report
+- Automatic notifications generated during irrigation state changes
 
-## 📨 Message Interface
+## Communication Protocol Interface
 
-### **Configuration Commands**
+### Configuration Command Set
 ```
-1                    → Configure 3.3V threshold
-2                    → Configure 5V threshold
-3                    → Manual watering
-4                    → Stop watering
-5                    → Set device name
-STATUS               → Get current status
-THRESH3V:500         → Set 3.3V threshold to 500
-THRESH5V:600         → Set 5V threshold to 600
-NAME:My Garden       → Set custom device name
+1                    → Configure 3.3V sensor threshold
+2                    → Configure 5V sensor threshold
+3                    → Initiate manual irrigation cycle
+4                    → Terminate irrigation cycle
+5                    → Configure device identifier
+STATUS               → Request system status report
+THRESH3V:500         → Set 3.3V threshold to value 500
+THRESH5V:600         → Set 5V threshold to value 600
+NAME:My Garden       → Configure custom device identifier
 ```
 
-### **System Responses**
+### System Response Protocol
 ```
 POPUP:Plant needs water - Watering started!
 NOTIFICATION:Automatic watering in progress
@@ -73,48 +73,48 @@ INPUT:Enter 3.3V threshold (0-1023):
 CURRENT:500
 ```
 
-## 🔔 Notification Types
+## Notification System Classification
 
-### **Automatic Notifications**
-- **🌱 Plant needs water** - When sensors detect dry soil
-- **💧 Watering started** - When automatic watering begins
-- **✅ Watering completed** - When watering cycle finishes
-- **📊 Status updates** - Periodic sensor readings
+### Automatic System Notifications
+- Irrigation requirement detected when sensors exceed threshold values
+- Irrigation cycle initiation notification upon automatic system activation
+- Irrigation cycle completion notification when watering sequence terminates
+- Periodic status updates containing current sensor readings and system state
 
-### **Configuration Popups**
-- **Welcome message** when device connects
-- **Setting confirmations** when thresholds change
-- **Error messages** for invalid inputs
-- **Menu options** for system configuration
+### Configuration Interface Notifications
+- Initial connection welcome message upon device pairing
+- Parameter change confirmations when threshold values are modified
+- Error notifications for invalid input or system constraint violations
+- Menu option displays for available system configuration functions
 
-## 📊 Status Monitoring
+## System Status Monitoring
 
-### **Device Name Status**
-The device name shows real-time status:
+### Device Name Status Encoding
+The device identifier displays real-time system status information:
 ```
-PlantSystem_Healthy_3V450_5V520     → All good, sensors reading 450/520
-PlantSystem_NeedsWater_3V650_5V720  → Dry soil detected
-PlantSystem_Watering_3V650_5V720    → Currently watering
+PlantSystem_Healthy_3V450_5V520     → Optimal conditions, sensor values 450/520
+PlantSystem_NeedsWater_3V650_5V720  → Threshold exceeded, irrigation required
+PlantSystem_Watering_3V650_5V720    → Active irrigation cycle in progress
 ```
 
-### **LED Indicators**
-- **Solid on** → Connected to phone, system idle
-- **Fast blink** → Watering while connected
-- **Slow blink** → No phone connection
-- **Medium blink** → Watering without phone connection
+### LED Status Indication Protocol
+- Solid illumination → Mobile device connected, system in standby mode
+- Rapid flash pattern → Irrigation active while mobile device connected
+- Slow flash pattern → No mobile device connection established
+- Medium flash pattern → Irrigation active without mobile device connection
 
-## 🛠️ Technical Implementation
+## Technical Implementation Details
 
-### **Bluetooth Commands Used**
+### Bluetooth Low Energy Command Set
 ```arduino
-AT+GAPDEVNAME=PlantSystem_Status    // Update device name
-POPUP:Message                       // Send popup notification  
-NOTIFICATION:Status                 // Send system notification
-INPUT:Prompt                        // Request user input
-MENU:Options                        // Show menu options
+AT+GAPDEVNAME=PlantSystem_Status    // Device name update command
+POPUP:Message                       // Popup notification transmission
+NOTIFICATION:Status                 // System notification broadcast
+INPUT:Prompt                        // User input request generation
+MENU:Options                        // Menu option display command
 ```
 
-### **Message Protocol**
+### Communication Message Protocol
 ```
 Phone → Arduino:
 CMD:1              → Configuration command
@@ -128,76 +128,57 @@ INPUT:Prompt       → Input request
 MENU:Options       → Menu display
 ```
 
-## 📱 Phone Compatibility
+## Mobile Device Platform Compatibility
 
-### **Android**
-- ✅ **Native Bluetooth notifications**
-- ✅ **System popup dialogs**  
-- ✅ **Bluetooth chat interface**
-- ✅ **Background notifications**
+### Android Operating System
+- Full native Bluetooth notification support
+- System-level popup dialog integration
+- Bluetooth serial communication interface compatibility
+- Background notification processing capability
 
-### **iPhone**
-- ✅ **Bluetooth pairing popups**
-- ⚠️ **Limited notification support**
-- ✅ **Bluetooth messaging apps**
-- ⚠️ **iOS restrictions on system popups**
+### iOS Operating System  
+- Bluetooth pairing interface support
+- Limited notification system access due to platform restrictions
+- Third-party Bluetooth messaging application compatibility
+- iOS security model limitations on system popup generation
 
-## 🎯 Advantages
+## System Architecture Advantages
 
-### **No App Required**
-- ✅ **Use any Bluetooth terminal app** (many free options)
-- ✅ **Native phone integration**
-- ✅ **Works immediately after pairing**
-- ✅ **No app store, no permissions**
+### Application-Independent Operation
+- Compatible with standard Bluetooth terminal applications (multiple free options available)
+- Native mobile operating system integration without custom application requirements
+- Immediate functionality following device pairing completion
+- No application store distribution or permission management requirements
 
-### **Smart Status Display**
-- ✅ **Device name shows current status**
-- ✅ **Real-time sensor readings in name**
-- ✅ **Immediate status visibility**
-- ✅ **No need to connect to check status**
+### Intelligent Status Reporting
+- Device identifier contains real-time system status information
+- Live sensor data embedded in Bluetooth device name
+- Instantaneous status visibility without connection establishment
+- Continuous monitoring capability without active communication session
 
-### **Simple Configuration**
-- ✅ **Number-based menu system**
-- ✅ **Immediate feedback**
-- ✅ **Error handling**
-- ✅ **Persistent settings**
+### Streamlined Configuration Interface
+- Numerical menu system for simplified user interaction
+- Real-time feedback for all configuration changes
+- Comprehensive error handling and validation
+- Non-volatile parameter storage for configuration persistence
 
-## 📋 Usage Workflow
+## Operational Workflow Procedures
 
-### **Daily Use**
-1. **Check device name** in Bluetooth settings for current status
-2. **Automatic notifications** alert you to watering events
-3. **Manual control** via simple message commands
+### Standard Operation Protocol
+1. Monitor device identifier in Bluetooth settings for current system status
+2. Receive automatic notifications for irrigation events and system state changes
+3. Execute manual control functions via standardized message commands
 
-### **Configuration**
-1. **Pair device** → Triggers welcome popup
-2. **Send number** → Select configuration option
-3. **Follow prompts** → Enter new values
-4. **Get confirmation** → Settings saved
+### System Configuration Protocol
+1. Initiate device pairing to trigger welcome interface generation
+2. Transmit numerical selection for desired configuration option
+3. Respond to system prompts with appropriate parameter values
+4. Receive confirmation notification upon successful parameter storage
 
-### **Monitoring**
-1. **Device name updates** show real-time status
-2. **Periodic notifications** provide status updates
-3. **LED indicators** show connection and activity
-4. **Send "STATUS"** for detailed information
-
-## 🔧 Troubleshooting
-
-### **No Popups Appearing**
-- Try a **Bluetooth terminal app** (Serial Bluetooth Terminal, etc.)
-- Check **notification permissions**
-- Ensure **device is paired properly**
-
-### **Device Not Found**
-- **Reset Arduino** and wait 30 seconds
-- **Clear Bluetooth cache** on phone
-- **Check SparkFun nRF52840 connections**
-
-### **Commands Not Working**
-- **Use Bluetooth terminal app** for reliable messaging
-- **Check message format** (exactly as shown)
-- **Wait for prompts** before sending commands
+### Continuous Monitoring Protocol
+1. Device name updates provide real-time system status information
+2. Periodic notifications deliver comprehensive status reports
+3. LED indication patterns communicate connection and operational status
+4. Transmit "STATUS" command for detailed system information retrieval
 
 ---
-
-**Perfect for students - No app development required! 📱🌱**

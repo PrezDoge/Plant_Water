@@ -1,63 +1,58 @@
 # Plant Watering System - Complete Wiring Guide
 
-## 📋 Hardware Overview
+## Hardware Overview
 
-### **Current Wiring (From Your Diagram)**
-Your diagram shows the basic sensor connections to the SparkFun RedBoard:
+### Current Wiring Status
+The basic sensor connections to the SparkFun RedBoard are established:
 
 **Moisture Sensors:**
-- **Left Sensor (3.3V)** → RedBoard A0 (Analog Pin)
-- **Right Sensor (5V)** → RedBoard A1 (Analog Pin)
-- **Power connections** for both sensors
+- Left Sensor (3.3V) → RedBoard A0 (Analog Pin)
+- Right Sensor (5V) → RedBoard A1 (Analog Pin)  
+- Power connections for both sensors
 
-## 🔌 Complete Wiring Diagram
+## Complete System Wiring Diagram
 
-### **All Components Pin Mapping**
+### All Components Pin Mapping
 
 | Component | RedBoard Pin | Wire Color | Notes |
 |-----------|-------------|------------|-------|
 | **Moisture Sensors** |
-| 3.3V Moisture Sensor (Signal) | A0 | Red | From your diagram |
-| 5V Moisture Sensor (Signal) | A1 | Blue | From your diagram |
-| 3.3V Sensor Power | 3.3V | - | Power rail |
-| 5V Sensor Power | 5V | - | Power rail |
-| Sensor Grounds | GND | Black | Common ground |
-| **Motor Control (H-Bridge)** |
-| DRV8871 IN1 | Pin 7 | Yellow | Motor direction 1 |
-| DRV8871 IN2 | Pin 8 | Green | Motor direction 2 |
-| DRV8871 VCC | 5V | Red | Power supply |
-| DRV8871 GND | GND | Black | Ground |
-| **SparkFun Pro nRF52840 Mini** |
-| SparkFun nRF52840 TX | Pin 4 | Orange | Arduino RX |
-| SparkFun nRF52840 RX | Pin 5 | Purple | Arduino TX |
-| SparkFun nRF52840 VCC | 3.3V | Red | 3.3V power |
-| SparkFun nRF52840 GND | GND | Black | Ground |
-| **Status Indicator** |
-| Status LED | Pin 13 | - | Built-in LED |
+| 3.3V Moisture Sensor (Signal) | A0 | Red | Analog input |
+| 5V Moisture Sensor (Signal) | A1 | Blue | Analog input |
+| 3.3V Sensor VCC | 3.3V | Red | Power rail |
+| 5V Sensor VCC | 5V | Red | Power rail |
+| Both Sensor GND | GND | Black | Common ground |
+| **Motor Control System** |
+| DRV8871 IN1 | Pin 7 | Yellow | Motor direction control 1 |
+| DRV8871 IN2 | Pin 8 | Green | Motor direction control 2 |
+| DRV8871 VM (Motor Power) | External 12V | Red | High current motor supply |
+| DRV8871 VCC (Logic Power) | 5V | Red | Logic level supply |
+| DRV8871 GND | GND | Black | Common ground |
+| Motor Positive | DRV8871 OUT1 | Red | Motor terminal |
+| Motor Negative | DRV8871 OUT2 | Black | Motor terminal |
+| **Bluetooth Communication** |
+| SparkFun nRF52840 TX | Pin 5 | Orange | Arduino RX (SoftwareSerial) |
+| SparkFun nRF52840 RX | Pin 4 | Purple | Arduino TX (SoftwareSerial) |
+| SparkFun nRF52840 VCC | 3.3V | Red | 3.3V power only |
+| SparkFun nRF52840 GND | GND | Black | Common ground |
+| **Power System** |
+| LM2596 IN+ | 12V DC Supply | Red | Input voltage |
+| LM2596 IN- | 12V DC Supply | Black | Input ground |
+| LM2596 OUT+ | RedBoard VIN | Red | Regulated 5V output |
+| LM2596 OUT- | RedBoard GND | Black | Output ground |
+| **Status Indicators** |
+| Built-in LED | Pin 13 | - | System status indicator |
 
-## 🔧 Additional Components Needed
-
-### **Motor Control System**
-```
-RedBoard Pin 7 → DRV8871 IN1
-RedBoard Pin 8 → DRV8871 IN2
-DRV8871 OUT1 → DC Motor +
-DRV8871 OUT2 → DC Motor -
-DRV8871 VCC → 5V (or higher for motor)
-DRV8871 GND → Common Ground
-```
-
-### **SparkFun Pro nRF52840 Mini**
-```
-RedBoard Pin 4 → SparkFun nRF52840 RX
-RedBoard Pin 5 → SparkFun nRF52840 TX  
-RedBoard 3.3V → SparkFun nRF52840 VCC
-RedBoard GND → SparkFun nRF52840 GND
-```
+### Bluetooth Module Pin Details
+The SparkFun Pro nRF52840 Mini connects to the RedBoard using SoftwareSerial communication:
+- **TX (nRF52840) → Pin 5 (RedBoard)**: Data transmission from Bluetooth module
+- **RX (nRF52840) → Pin 4 (RedBoard)**: Data reception to Bluetooth module  
+- **VCC → 3.3V Rail**: Power supply (critical: never use 5V)
+- **GND → Common Ground**: Shared ground connection
 
 
 
-## ⚡ Power Supply Considerations
+## Power Supply Considerations
 
 ### **Voltage Requirements**
 - **RedBoard**: 5V via USB or barrel jack
@@ -75,115 +70,79 @@ Main Power → 12V DC Adapter
 12V → DRV8871 motor driver → DC Motor
 ```
 
-## 🔗 Complete System Wiring
+## Complete System Wiring
 
-### **Breadboard Layout Suggestion**
-```
-Power Rails:
-- Top rail: 5V (from RedBoard)
-- Bottom rail: GND (common ground)
-- Side rail: 3.3V (from RedBoard)
+### Breadboard Layout
 
-Component Placement:
-- SparkFun nRF52840 Mini: Left side of breadboard
-- DRV8871: Right side of breadboard
-- Sensors: Connect via jumper wires to soil
-```
+**Power Rail Configuration:**
+- Top rail: +5V (from RedBoard regulated output)
+- Bottom rail: GND (common ground for all components)
+- Side rail: +3.3V (from RedBoard 3.3V output)
 
-### **Wire Management**
-- **Red wires**: Power (5V, 3.3V)
-- **Black wires**: Ground connections
-- **Colored wires**: Signal/data lines
-- **Label connections**: For easy troubleshooting
+**Component Physical Layout:**
+- SparkFun nRF52840 Mini: Left section of breadboard
+- DRV8871 H-Bridge: Right section of breadboard  
+- Moisture Sensors: Connected via jumper wires to measurement points
+- Power regulation components: Separate area for LM2596
 
-## 🛠️ Assembly Steps
+**Wire Management Standards:**
+- Red wires: All positive power connections (5V, 3.3V, 12V)
+- Black wires: All ground connections
+- Colored signal wires: Data and control lines (yellow, green, orange, purple)
+- Wire labeling: Use tape labels for complex connections to enable troubleshooting
 
-### **Step 1: Basic Connections (Your Current Setup)**
-✅ You already have the moisture sensors connected correctly!
+## Assembly Steps
 
-### **Step 2: Add Motor Control**
-1. Connect DRV8871 H-bridge to pins 7 and 8
-2. Connect motor to H-bridge outputs
-3. Provide appropriate power supply to H-bridge
+### Step 1: Verify Moisture Sensor Connections
+Current sensor setup is correctly implemented according to your existing diagram:
+- 3.3V moisture sensor signal → RedBoard pin A0
+- 5V moisture sensor signal → RedBoard pin A1
+- Power and ground connections established
 
-### **Step 3: Add Bluetooth Module**
-1. Connect SparkFun nRF52840 Mini to pins 4 and 5
-2. **Important**: Use 3.3V power, not 5V!
-3. Connect common ground
+### Step 2: Install Motor Control System
+1. Mount DRV8871 H-Bridge on breadboard
+2. Connect control pins: IN1 → Pin 7, IN2 → Pin 8
+3. Connect motor power: VM → 12V external, VCC → 5V logic
+4. Wire motor terminals to DRV8871 OUT1 and OUT2
+5. Establish common ground connections
 
-### **Step 4: Power Supply**
-1. Use external 12V supply for motor power
-2. Buck converter to provide regulated 5V
-3. RedBoard provides regulated 3.3V
+### Step 3: Integrate Bluetooth Communication
+1. Position SparkFun nRF52840 Mini on breadboard
+2. Wire communication: TX → Pin 5, RX → Pin 4 (SoftwareSerial)
+3. Power connection: VCC → 3.3V rail (critical: do not use 5V)
+4. Connect GND to common ground rail
 
-## 🧪 Testing Sequence
+### Step 4: Implement Power Distribution System
+1. Connect 12V external power supply to system
+2. Install LM2596 buck converter: 12V input → 5V regulated output
+3. Route 5V to RedBoard VIN pin for system power
+4. Verify 3.3V regulation from RedBoard for nRF52840 Mini
+5. Test all voltage levels before connecting components
 
-### **1. Test Sensors First** (You can do this now!)
+## Testing Sequence
+
+### 1. Sensor Validation Testing
 ```cpp
-// Upload plant_water_basic.ino
-// Open Serial Monitor
-// Check sensor readings
+// Upload plant_water_basic.ino to RedBoard
+// Open Serial Monitor at 9600 baud
+// Verify moisture sensor readings display correctly
+// Test both dry and wet conditions for each sensor
 ```
 
-### **2. Test Motor Control**
+### 2. Motor Control System Testing  
 ```cpp
-// Upload examples/pump_test.ino
-// Verify motor runs forward/reverse
-// Check H-bridge connections
+// Upload examples/pump_test.ino to RedBoard
+// Verify motor runs in forward direction
+// Test motor reverse functionality
+// Confirm H-bridge thermal protection
+// Check motor current consumption
 ```
 
-### **3. Test Bluetooth**
+### 3. Bluetooth Communication Testing
 ```cpp
-// Upload plant_water.ino
-// Pair with phone
-// Test popup interface
+// Upload plant_water.ino to RedBoard
+// Enable phone Bluetooth and scan for devices
+// Look for "Plant Monitor - Status" in device list
+// Pair with device and test popup interface functionality
+// Verify threshold setting and device naming features
 ```
-
-## ⚠️ Safety Notes
-
-### **Electrical Safety**
-- **Double-check voltage levels** before connecting
-- **SparkFun nRF52840 is 3.3V only** - 5V will damage it!
-- **Isolate motor power** from logic power
-- **Use fuses** on high-current connections
-
-### **Water Safety**
-- **Keep electronics away from water**
-- **Use waterproof connectors** for sensors
-- **Test system before leaving unattended**
-
-## 📊 Troubleshooting
-
-### **Sensors Not Reading**
-- Check A0 and A1 connections
-- Verify sensor power (3.3V and 5V)
-- Test with multimeter
-
-### **Motor Not Working**
-- Check H-bridge connections (pins 7, 8)
-- Verify motor power supply
-- Test H-bridge with LED first
-
-### **Bluetooth Not Connecting**
-- Verify 3.3V power to SparkFun nRF52840
-- Check TX/RX connections (crossed correctly)  
-- Ensure common ground connection
-
-## 🌟 **SparkFun Pro nRF52840 Mini Advantages**
-
-### **Why This Board is Perfect for Your Project:**
-- ✅ **USB-C Programming** - No external programmer needed
-- ✅ **Built-in 3.3V Regulator** - Clean power, no external components
-- ✅ **Arduino IDE Support** - Program like regular Arduino
-- ✅ **Professional PCB** - Reliable connections and proper layout
-- ✅ **SparkFun Quality** - Excellent documentation and support
-- ✅ **Debugging Features** - Serial monitor via USB-C
-- ✅ **Compact Design** - Perfect for breadboard prototyping
-
-### **Programming Options:**
-1. **As Bluetooth Module** (Current design) - Use with Arduino as main controller
-2. **As Main Controller** (Advanced) - Replace Arduino entirely for single-board solution
-
----
-
-**Your sensor wiring looks perfect! Now just add the missing components following this guide. 🌱**

@@ -14,7 +14,7 @@ An intelligent Arduino-based plant watering system that uses dual moisture senso
 
 ##  Two Operation Modes
 
-### **Bluetooth Popup Interface** (Recommended)
+### **Bluetooth Popup Interface**
 - **File**: `plant_water.ino`
 - **Interface**: Native phone Bluetooth popups and notifications
 - **Setup**: Pair with device, follow popup menus
@@ -37,13 +37,6 @@ An intelligent Arduino-based plant watering system that uses dual moisture senso
 - SparkFun Pro nRF52840 Mini Bluetooth Development Board
 - Breadboard and jumper wires  
 - Water reservoir and tubing
-
-### SparkFun Pro nRF52840 Mini Benefits
-- **USB-C Programming**: Direct programming via Arduino IDE
-- **Built-in Voltage Regulation**: Clean 3.3V power management
-- **Professional PCB**: Reliable connections and debugging
-- **SparkFun Documentation**: Excellent tutorials and support
-- **Arduino IDE Compatible**: Easy development workflow
 
 ### Pin Connections
 
@@ -73,7 +66,7 @@ An intelligent Arduino-based plant watering system that uses dual moisture senso
 
 ##  Quick Start
 
-### **Option 1: Bluetooth Popup Interface (Recommended)**
+### **Option 1: Bluetooth Popup Interface**
 1. **Upload Code**: Use `plant_water.ino`
 2. **Pair Device**: Look for "PlantSystem_..." in Bluetooth settings
 3. **Follow Popups**: Configure via native phone notifications
@@ -112,17 +105,17 @@ STATUS     - Show current status
 
 ## Usage
 
-### Without Bluetooth Module (Current Setup)
+### Without Bluetooth Module
 1. **Set BLUETOOTH_ENABLED = false** in the code
 2. **Automatic Mode**: System runs continuously, watering when either sensor is dry
 3. **Manual Override**: Press button to force watering cycle
 4. **Monitoring**: Check Serial Monitor for system status
 5. **Testing Commands**: Use Serial Monitor to test Bluetooth commands
 
-### With Bluetooth Module (When Available)
+### With Bluetooth Module
 1. **Set BLUETOOTH_ENABLED = true** in the code
 2. **Connect nRF52840** module to pins 4 and 5
-3. **Phone App Control**: 
+3. **Phone Control**: 
    - Set thresholds remotely: "SET_THRESHOLD_3V:500"
    - Get status: "GET_STATUS"
    - Manual watering: "MANUAL_WATER"
@@ -130,21 +123,6 @@ STATUS     - Show current status
 4. **Real-time Data**: Automatic updates every 10 seconds to phone
 5. **Connection Status**: Monitor Bluetooth connection in system status
 
-## Troubleshooting
-
-### Common Issues
-- **Pump not running**: Check relay connections and power supply
-- **False readings**: Clean sensor contacts, check wiring
-- **System not responding**: Verify Arduino connections and upload
-
 ### Serial Monitor Output
 Monitor system status through Serial Monitor at 9600 baud rate.
 
-## Safety Notes
-
-**Important Safety Guidelines**
-- Use proper relay for pump switching
-- Ensure water-resistant connections
-- Don't leave system unattended for extended periods
-- Check water reservoir regularly
-- Use appropriate power supply for pump
