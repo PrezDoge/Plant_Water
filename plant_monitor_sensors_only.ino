@@ -1,370 +1,581 @@
 /*
- * Agricultural Soil Monitoring System with Wireless Data Transmission
+ * ========================================================================
+ * SOIL MOISTURE MONITORING SYSTEM - SENSOR ONLY MODE
+ * ========================================================================
  * 
- * CENG 3264: Embedded Systems Design Project
- * Author: [Student Name]
- * Date: November 2025
+ * PROJECT: CENG 3264 Embedded Systems Design
+ * BOARD: Arduino Uno (Select "Arduino Uno" in Arduino IDE Tools > Board)
+ * PURPOSE: Professional soil monitoring with Bluetooth data transmission
  * 
- * SYSTEM OVERVIEW:
- * This embedded system implements a dual-sensor soil moisture monitoring solution
- * with wireless Bluetooth Low Energy data transmission capabilities. The system
- * provides real-time agricultural monitoring with configurable threshold parameters
- * and automated alert generation for precision agriculture applications.
+ * HARDWARE REQUIREMENTS:
+ * - Arduino Uno or compatible (SparkFun RedBoard DEV-15025)
+ * - 2x DFRobot SEN0193 Capacitive Soil Moisture Sensors
+ * - SparkFun Pro nRF52840 Mini (Bluetooth module)
+ * - Jumper wires and breadboard
  * 
- * HARDWARE SPECIFICATIONS:
- * - Primary Controller: SparkFun RedBoard (DEV-15025) - Arduino Uno Compatible
- * - Sensor Array: Two DFRobot SEN0193 Capacitive Soil Moisture Sensors
- * - Wireless Module: SparkFun Pro nRF52840 Mini (Bluetooth 5.0 BLE)
- * - Communication: UART via SoftwareSerial library (9600 baud)
- * - Power Requirements: 5V DC via USB or external adapter
+ * ARDUINO IDE SETUP:
+ * 1. Select Tools > Board > "Arduino Uno"
+ * 2. Select correct COM port under Tools > Port
+ * 3. Verify sketch compiles without errors
+ * 4. Upload to board
  * 
- * SYSTEM CAPABILITIES:
- * - Continuous soil moisture monitoring with 5-second sampling interval
- * - Wireless data transmission via Bluetooth Low Energy protocol
- * - Remote threshold configuration through mobile device interface
- * - Automated alert generation for moisture deficit conditions
- * - Statistical data logging with timestamp correlation
- * - Dynamic device identification with real-time status indication
+ * PIN CONNECTIONS:
+ * - Soil Sensor 1 → A0 (analog)
+ * - Soil Sensor 2 → A1 (analog) 
+ * - nRF52840 TX → Pin 4 (digital)
+ * - nRF52840 RX → Pin 5 (digital)
+ * - Status LED → Pin 13 (built-in)
  * 
- * TECHNICAL SPECIFICATIONS:
- * - ADC Resolution: 10-bit (0-1023 digital values)
- * - Sensor Range: 0-100% volumetric soil moisture content
- * - Wireless Range: 10+ meters (Bluetooth Class 2)
- * - Data Rate: Configurable transmission intervals
- * - Alert Latency: <500ms for threshold violations
+ * FEATURES:
+ * - Dual soil moisture monitoring
+ * - Bluetooth Low Energy data transmission
+ * - Real-time threshold alerts
+ * - Remote configuration via mobile device
+ * - Professional data logging
+ * 
+ * ========================================================================
  */
 
 #include <SoftwareSerial.h>
 
-// HARDWARE INTERFACE DEFINITIONS
-// Analog input channels for soil moisture sensors
-const int SOIL_MOISTURE_SENSOR_1_PIN = A0;    // Primary soil moisture sensor input
-const int SOIL_MOISTURE_SENSOR_2_PIN = A1;    // Secondary soil moisture sensor input
-const int SYSTEM_STATUS_LED_PIN = 13;         // Built-in status indicator LED
+// ========================================================================
+// HARDWARE PIN DEFINITIONS
+// ========================================================================
+const int SOIL_SENSOR_1_PIN = A0;        // Primary soil moisture sensor
+const int SOIL_SENSOR_2_PIN = A1;        // Secondary soil moisture sensor  
+const int STATUS_LED_PIN = 13;           // Built-in Arduino LED
+const int BLUETOOTH_TX_PIN = 4;          // To nRF52840 RX
+const int BLUETOOTH_RX_PIN = 5;          // From nRF52840 TX
 
-// UART communication interface for Bluetooth module
-const int BLE_UART_TX_PIN = 4;                // MCU TX to nRF52840 RX
-const int BLE_UART_RX_PIN = 5;                // MCU RX from nRF52840 TX
-SoftwareSerial bluetoothInterface(BLE_UART_RX_PIN, BLE_UART_TX_PIN);
+// Create Bluetooth communication interface
+SoftwareSerial bluetooth(BLUETOOTH_RX_PIN, BLUETOOTH_TX_PIN);
 
-// SYSTEM CONFIGURATION STRUCTURE
-typedef struct {
-  char deviceIdentifier[32];              // Bluetooth device name with status
-  uint16_t moistureThresholdSensor1;      // Sensor 1 dry condition threshold (ADC units)
-  uint16_t moistureThresholdSensor2;      // Sensor 2 dry condition threshold (ADC units)  
-  bool alertNotificationsEnabled;         // Alert system enable/disable flag
-  uint32_t sensorSamplingInterval;        // Sensor reading interval (milliseconds)
-} SystemConfiguration;
-
-// Initialize system configuration with default parameters
-SystemConfiguration systemConfig = {
-  "AgroMonitor_Operational",              // Default device identifier
-  300,                                    // Default threshold sensor 1 (empirically determined)
-  300,                                    // Default threshold sensor 2 (empirically determined)
-  true,                                   // Notifications enabled by default
-  5000                                    // 5-second sampling interval
+// ========================================================================
+// SYSTEM CONFIGURATION PARAMETERS
+// ========================================================================
+struct SystemConfig {
+  char deviceName[40];                    // Bluetooth device identifier
+  int soilThreshold1;                     // Sensor 1 dry threshold (0-1023)
+  int soilThreshold2;                     // Sensor 2 dry threshold (0-1023)
+  bool alertsEnabled;                     // Alert notifications on/off
+  unsigned long readingInterval;          // Time between sensor readings (ms)
+  bool dataStreamEnabled;                 // Continuous data streaming on/off
 };
 
+// Initialize with default values
+SystemConfig config = {
+  "SoilMonitor_Ready",                    // Default device name
+  350,                                    // Default threshold sensor 1
+  350,                                    // Default threshold sensor 2
+  true,                                   // Alerts enabled
+  5000,                                   // Read sensors every 5 seconds
+  false                                   // Data streaming disabled by default
+};
+
+// ========================================================================
 // SENSOR DATA STRUCTURE
-typedef struct {
-  uint16_t moistureLevel1;                // Sensor 1 ADC reading (0-1023)
-  uint16_t moistureLevel2;                // Sensor 2 ADC reading (0-1023)
-  bool moistureDeficit1;                  // Sensor 1 dry condition flag
-  bool moistureDeficit2;                  // Sensor 2 dry condition flag
-  uint32_t measurementTimestamp;          // System timestamp for measurement
-} SensorDataPoint;
+// ========================================================================
+struct SensorReading {
+  int moisture1;                          // Sensor 1 value (0-1023)
+  int moisture2;                          // Sensor 2 value (0-1023)
+  bool soil1Dry;                          // Sensor 1 dry status flag
+  bool soil2Dry;                          // Sensor 2 dry status flag
+  unsigned long timestamp;                // Reading timestamp
+};
 
-// GLOBAL SYSTEM STATE VARIABLES
-SensorDataPoint currentMeasurement;       // Current sensor readings
-SensorDataPoint previousMeasurement;      // Previous readings for change detection
-bool bluetoothConnectionStatus = false;   // BLE connection state flag
-uint32_t lastSensorSampleTime = 0;       // Timestamp of last sensor reading
-uint32_t lastStatusUpdateTime = 0;       // Timestamp of last status broadcast
-uint32_t lastDataTransmissionTime = 0;   // Timestamp of last data transmission
-uint16_t totalMeasurementCount = 0;      // Total number of measurements taken
+// ========================================================================
+// GLOBAL SYSTEM VARIABLES
+// ========================================================================
+SensorReading currentReading;             // Current sensor values
+SensorReading previousReading;            // Previous reading for comparison
+bool bluetoothConnected = false;          // Phone connection status
+unsigned long lastSensorRead = 0;        // Last sensor reading time
+unsigned long lastStatusUpdate = 0;      // Last device name update
+unsigned long lastDataTransmission = 0;  // Last data stream transmission
+unsigned long lastHeartbeat = 0;         // Last heartbeat signal
+int totalReadings = 0;                    // Total number of readings taken
 
-/*
- * SYSTEM INITIALIZATION ROUTINE
- * Configures hardware interfaces, initializes communication protocols,
- * and establishes baseline sensor readings for operational startup.
- */
+// ========================================================================
+// ARDUINO SETUP FUNCTION
+// ========================================================================
 void setup() {
-  // Initialize UART communication interfaces
-  Serial.begin(9600);                     // Debug/monitoring console interface
-  bluetoothInterface.begin(9600);         // Bluetooth module communication interface
+  // Initialize serial communications
+  Serial.begin(9600);                     // Debug console (Arduino IDE Serial Monitor)
+  bluetooth.begin(9600);                  // Bluetooth module communication
   
-  // System startup notification
-  Serial.println("========================================");
-  Serial.println("Agricultural Soil Monitoring System");
-  Serial.println("CENG 3264 Embedded Systems Project");
-  Serial.println("Firmware Version: 3.0.0");
-  Serial.println("========================================");
+  // Print startup banner
+  Serial.println(F("========================================"));
+  Serial.println(F("SOIL MOISTURE MONITORING SYSTEM"));
+  Serial.println(F("CENG 3264 - Sensor Only Mode"));
+  Serial.println(F("Arduino Uno Compatible"));
+  Serial.println(F("========================================"));
   
-  // Configure digital I/O pins
-  pinMode(SYSTEM_STATUS_LED_PIN, OUTPUT);
-  digitalWrite(SYSTEM_STATUS_LED_PIN, LOW);
+  // Configure hardware pins
+  pinMode(STATUS_LED_PIN, OUTPUT);
+  digitalWrite(STATUS_LED_PIN, LOW);
   
-  // Analog input pins (A0, A1) are automatically configured for ADC operation
+  // Analog pins A0, A1 are automatically configured for input
   
-  // Initialize wireless communication subsystem
-  initializeBluetoothInterface();
+  // Initialize Bluetooth module
+  initializeBluetooth();
   
-  // System operational status
-  Serial.println("System Status: OPERATIONAL");
-  Serial.println("Wireless Interface: READY");
-  Serial.println("Sensor Array: INITIALIZED");
-  Serial.println("Awaiting Bluetooth connection for remote monitoring...");
+  // Take initial sensor reading
+  readSensors();
+  previousReading = currentReading;
   
-  // Establish baseline sensor measurements
-  acquireSensorMeasurements();
-  previousMeasurement = currentMeasurement;
+  // System ready
+  Serial.println(F("System Status: OPERATIONAL"));
+  Serial.println(F("Bluetooth: READY FOR CONNECTION"));
+  Serial.println(F("Sensors: INITIALIZED"));
+  Serial.println();
+  Serial.println(F("Connect via Bluetooth to configure and monitor"));
+  Serial.print(F("Device Name: "));
+  Serial.println(config.deviceName);
+  Serial.println();
+  
+  // Flash LED to indicate ready
+  for (int i = 0; i < 3; i++) {
+    digitalWrite(STATUS_LED_PIN, HIGH);
+    delay(200);
+    digitalWrite(STATUS_LED_PIN, LOW);
+    delay(200);
+  }
 }
 
+// ========================================================================
+// ARDUINO MAIN LOOP FUNCTION  
+// ========================================================================
 void loop() {
-  // Handle Bluetooth communication
+  // Handle incoming Bluetooth messages
   handleBluetoothCommunication();
   
-  // Update device name with current status
-  updateBluetoothStatus();
+  // Update device name with current status periodically
+  updateDeviceStatus();
   
   // Read sensors at configured interval
   if (millis() - lastSensorRead >= config.readingInterval) {
-    readAllSensors();
+    readSensors();
     checkForAlerts();
     logSensorData();
     lastSensorRead = millis();
-    readingCount++;
+    totalReadings++;
   }
   
-  // Transmit data to phone periodically
-  if (bluetoothConnected && (millis() - lastDataTransmission >= 30000)) {
-    transmitSensorData();
+  // Send data stream if enabled and connected
+  if (bluetoothConnected && config.dataStreamEnabled && 
+      (millis() - lastDataTransmission >= 10000)) {
+    transmitDataStream();
     lastDataTransmission = millis();
   }
   
-  // Update LED status
-  updateStatusLED();
-}
-
-void initializeBluetooth() {
-  Serial.println("Initializing nRF52840 Bluetooth...");
-  
-  // Configure nRF52840
-  bluetooth.println("AT+RESET");
-  delay(1000);
-  
-  // Set discoverable name with status
-  updateDeviceName();
-  
-  // Enable notifications
-  bluetooth.println("AT+GAPDEVNAME=" + String(config.deviceName));
-  bluetooth.println("AT+GAPDISCONNECT");
-  bluetooth.println("AT+BLEADV_SET=ON");
-  
-  Serial.println("Bluetooth initialized - Device discoverable");
-  Serial.println("Device name: " + String(config.deviceName));
-}
-
-void updateDeviceName() {
-  String status = "PlantMonitor";
-  
-  // Add sensor status to device name
-  if (currentReading.soil1Dry || currentReading.soil2Dry) {
-    status += "_DryAlert";
-  } else {
-    status += "_Healthy";
+  // Send periodic heartbeat when connected
+  if (bluetoothConnected && (millis() - lastHeartbeat >= 60000)) {
+    bluetooth.println(F("HEARTBEAT:System operational"));
+    lastHeartbeat = millis();
   }
   
-  // Add current readings
-  status += "_S1:" + String(currentReading.soilMoisture1);
-  status += "_S2:" + String(currentReading.soilMoisture2);
+  // Update status LED
+  updateStatusLED();
   
-  strcpy(config.deviceName, status.c_str());
+  // Small delay for system stability
+  delay(100);
 }
 
-void updateBluetoothStatus() {
-  // Update device name every 20 seconds
-  if (millis() - lastStatusUpdate > 20000) {
+// ========================================================================
+// BLUETOOTH INITIALIZATION
+// ========================================================================
+void initializeBluetooth() {
+  Serial.println(F("Initializing Bluetooth module..."));
+  
+  // Reset and configure nRF52840
+  bluetooth.println(F("AT+RESET"));
+  delay(1000);
+  
+  // Set device name
+  updateDeviceName();
+  
+  // Configure advertising
+  bluetooth.print(F("AT+GAPDEVNAME="));
+  bluetooth.println(config.deviceName);
+  bluetooth.println(F("AT+GAPDISCONNECT"));
+  bluetooth.println(F("AT+BLEADV_SET=ON"));
+  
+  Serial.println(F("Bluetooth initialized successfully"));
+  Serial.print(F("Device name: "));
+  Serial.println(config.deviceName);
+}
+
+// ========================================================================
+// DEVICE NAME UPDATE WITH SENSOR STATUS
+// ========================================================================
+void updateDeviceName() {
+  // Create device name string manually to avoid String concatenation issues
+  strcpy(config.deviceName, "SoilMonitor");
+  
+  // Add current sensor status
+  if (currentReading.soil1Dry || currentReading.soil2Dry) {
+    strcat(config.deviceName, "_ALERT");
+  } else {
+    strcat(config.deviceName, "_OK");
+  }
+  
+  // Add sensor readings (limited by device name length)
+  char tempStr[10];
+  strcat(config.deviceName, "_S1:");
+  itoa(currentReading.moisture1, tempStr, 10);
+  strcat(config.deviceName, tempStr);
+  
+  strcat(config.deviceName, "_S2:");
+  itoa(currentReading.moisture2, tempStr, 10);
+  strcat(config.deviceName, tempStr);
+}
+
+// ========================================================================
+// PERIODIC DEVICE STATUS UPDATE
+// ========================================================================
+void updateDeviceStatus() {
+  // Update device name every 30 seconds
+  if (millis() - lastStatusUpdate >= 30000) {
     updateDeviceName();
-    bluetooth.println("AT+GAPDEVNAME=" + String(config.deviceName));
+    if (bluetoothConnected) {
+      bluetooth.print(F("AT+GAPDEVNAME="));
+      bluetooth.println(config.deviceName);
+    }
     lastStatusUpdate = millis();
   }
 }
 
+// ========================================================================
+// BLUETOOTH MESSAGE HANDLER
+// ========================================================================
 void handleBluetoothCommunication() {
   if (bluetooth.available()) {
     String message = bluetooth.readStringUntil('\n');
     message.trim();
     
-    // Check for connection events
+    Serial.print(F("BT Received: "));
+    Serial.println(message);
+    
+    // Check for connection status changes
     if (message.indexOf("CONNECTED") != -1) {
       bluetoothConnected = true;
-      Serial.println("Phone connected!");
+      Serial.println(F("*** BLUETOOTH CONNECTED ***"));
       sendWelcomeMessage();
     }
     else if (message.indexOf("DISCONNECTED") != -1) {
       bluetoothConnected = false;
-      Serial.println("Phone disconnected");
+      Serial.println(F("*** BLUETOOTH DISCONNECTED ***"));
     }
-    // Handle incoming commands
+    // Handle user commands
     else if (message.startsWith("CMD:")) {
-      processPhoneCommand(message.substring(4));
+      processUserCommand(message.substring(4));
     }
   }
 }
 
+// ========================================================================
+// WELCOME MESSAGE FOR NEW CONNECTIONS
+// ========================================================================
 void sendWelcomeMessage() {
-  bluetooth.println("POPUP: Plant Monitoring System Connected!");
+  bluetooth.println(F("POPUP:Soil Monitoring System Connected!"));
   delay(100);
-  bluetooth.println("POPUP:Current Sensor Readings:");
-  bluetooth.println("POPUP:Soil Sensor 1: " + String(currentReading.soilMoisture1) + " (Threshold: " + String(config.soilDryThreshold1) + ")");
-  bluetooth.println("POPUP:Soil Sensor 2: " + String(currentReading.soilMoisture2) + " (Threshold: " + String(config.soilDryThreshold2) + ")");
-  delay(100);
+  bluetooth.println(F("POPUP:=== CURRENT STATUS ==="));
   
-  // Send menu options
-  bluetooth.println("MENU:Available Commands:");
-  bluetooth.println("MENU:1 - Current Readings");
-  bluetooth.println("MENU:2 - Set Soil Threshold 1");
-  bluetooth.println("MENU:3 - Set Soil Threshold 2"); 
-  bluetooth.println("MENU:4 - Data Stream ON/OFF");
-  bluetooth.println("MENU:5 - Reset Counters");
-  bluetooth.println("MENU:Reply with number");
+  // Send sensor 1 status
+  bluetooth.print(F("POPUP:Soil Sensor 1: "));
+  bluetooth.print(currentReading.moisture1);
+  bluetooth.print(F(" (Threshold: "));
+  bluetooth.print(config.soilThreshold1);
+  bluetooth.println(F(")"));
+  
+  // Send sensor 2 status  
+  bluetooth.print(F("POPUP:Soil Sensor 2: "));
+  bluetooth.print(currentReading.moisture2);
+  bluetooth.print(F(" (Threshold: "));
+  bluetooth.print(config.soilThreshold2);
+  bluetooth.println(F(")"));
+  
+  delay(200);
+  
+  // Send available commands menu
+  bluetooth.println(F("MENU:=== AVAILABLE COMMANDS ==="));
+  bluetooth.println(F("MENU:1 - Current Readings"));
+  bluetooth.println(F("MENU:2 - Set Sensor 1 Threshold"));
+  bluetooth.println(F("MENU:3 - Set Sensor 2 Threshold"));
+  bluetooth.println(F("MENU:4 - Toggle Alerts"));
+  bluetooth.println(F("MENU:5 - Toggle Data Stream"));
+  bluetooth.println(F("MENU:6 - System Statistics"));
+  bluetooth.println(F("MENU:7 - Reset Counters"));
+  bluetooth.println(F("MENU:0 - Show Menu"));
+  bluetooth.println(F("MENU:Reply with command number"));
 }
 
-void processPhoneCommand(String command) {
-  Serial.println("Received command: " + command);
+// ========================================================================
+// USER COMMAND PROCESSOR
+// ========================================================================
+void processUserCommand(String command) {
+  Serial.print(F("Processing command: "));
+  Serial.println(command);
   
-  if (command == "1") {
-    // Send current readings
+  if (command == "0") {
+    // Show menu
+    sendWelcomeMessage();
+  }
+  else if (command == "1") {
+    // Current readings
     sendCurrentReadings();
   }
   else if (command == "2") {
-    bluetooth.println("INPUT:Enter Soil Sensor 1 threshold (0-1023):");
-    bluetooth.println("CURRENT:" + String(config.soilDryThreshold1));
+    // Set threshold 1
+    bluetooth.println(F("INPUT:Enter Sensor 1 threshold (0-1023):"));
+    bluetooth.print(F("CURRENT:Current value: "));
+    bluetooth.println(config.soilThreshold1);
   }
   else if (command == "3") {
-    bluetooth.println("INPUT:Enter Soil Sensor 2 threshold (0-1023):");
-    bluetooth.println("CURRENT:" + String(config.soilDryThreshold2));
+    // Set threshold 2
+    bluetooth.println(F("INPUT:Enter Sensor 2 threshold (0-1023):"));
+    bluetooth.print(F("CURRENT:Current value: "));
+    bluetooth.println(config.soilThreshold2);
   }
   else if (command == "4") {
+    // Toggle alerts
     config.alertsEnabled = !config.alertsEnabled;
-    bluetooth.println("POPUP:Alerts " + String(config.alertsEnabled ? "ENABLED" : "DISABLED"));
+    bluetooth.print(F("POPUP:Alerts "));
+    bluetooth.println(config.alertsEnabled ? F("ENABLED") : F("DISABLED"));
   }
   else if (command == "5") {
-    readingCount = 0;
-    bluetooth.println("POPUP:Counters reset!");
+    // Toggle data streaming
+    config.dataStreamEnabled = !config.dataStreamEnabled;
+    bluetooth.print(F("POPUP:Data Stream "));
+    bluetooth.println(config.dataStreamEnabled ? F("ENABLED") : F("DISABLED"));
   }
-  else if (command.startsWith("THRESH1:")) {
-    int newThreshold = command.substring(8).toInt();
+  else if (command == "6") {
+    // System statistics
+    sendSystemStatistics();
+  }
+  else if (command == "7") {
+    // Reset counters
+    totalReadings = 0;
+    bluetooth.println(F("POPUP:Statistics reset!"));
+  }
+  else if (command.startsWith("SET1:")) {
+    // Set threshold 1
+    int newThreshold = command.substring(5).toInt();
     if (newThreshold >= 0 && newThreshold <= 1023) {
-      config.soilDryThreshold1 = newThreshold;
-      bluetooth.println("POPUP:Soil Sensor 1 threshold set to " + String(newThreshold));
+      config.soilThreshold1 = newThreshold;
+      bluetooth.print(F("POPUP:Sensor 1 threshold set to "));
+      bluetooth.println(newThreshold);
+      Serial.print(F("Threshold 1 updated to: "));
+      Serial.println(newThreshold);
     } else {
-      bluetooth.println("POPUP:Error: Threshold must be 0-1023");
+      bluetooth.println(F("POPUP:ERROR: Value must be 0-1023"));
     }
   }
-  else if (command.startsWith("THRESH2:")) {
-    int newThreshold = command.substring(8).toInt();
+  else if (command.startsWith("SET2:")) {
+    // Set threshold 2
+    int newThreshold = command.substring(5).toInt();
     if (newThreshold >= 0 && newThreshold <= 1023) {
-      config.soilDryThreshold2 = newThreshold;
-      bluetooth.println("POPUP:Soil Sensor 2 threshold set to " + String(newThreshold));
+      config.soilThreshold2 = newThreshold;
+      bluetooth.print(F("POPUP:Sensor 2 threshold set to "));
+      bluetooth.println(newThreshold);
+      Serial.print(F("Threshold 2 updated to: "));
+      Serial.println(newThreshold);
     } else {
-      bluetooth.println("POPUP:Error: Threshold must be 0-1023");
+      bluetooth.println(F("POPUP:ERROR: Value must be 0-1023"));
     }
+  }
+  else {
+    bluetooth.println(F("POPUP:Unknown command. Send '0' for menu."));
   }
 }
 
+// ========================================================================
+// SEND CURRENT SENSOR READINGS
+// ========================================================================
 void sendCurrentReadings() {
-  bluetooth.println("DATA:=== Current Sensor Readings ===");
-  bluetooth.println("DATA:Soil Sensor 1: " + String(currentReading.soilMoisture1) + " " + 
-                    (currentReading.soil1Dry ? "(DRY)" : "(WET)"));
-  bluetooth.println("DATA:Soil Sensor 2: " + String(currentReading.soilMoisture2) + " " + 
-                    (currentReading.soil2Dry ? "(DRY)" : "(WET)"));
-  bluetooth.println("DATA:Reading Count: " + String(readingCount));
-  bluetooth.println("DATA:Uptime: " + String(millis() / 1000) + " seconds");
-}
-
-void transmitSensorData() {
-  bluetooth.println("STREAM:DATA_UPDATE");
-  bluetooth.println("STREAM:" + String(currentReading.soilMoisture1) + "," + 
-                    String(currentReading.soilMoisture2) + "," + 
-                    String(millis()));
-}
-
-void readAllSensors() {
-  // Store previous reading
-  lastReading = currentReading;
+  bluetooth.println(F("DATA:=== CURRENT SENSOR READINGS ==="));
   
-  // Read soil sensors
-  currentReading.soilMoisture1 = analogRead(SOIL_MOISTURE_PIN_1);
-  currentReading.soilMoisture2 = analogRead(SOIL_MOISTURE_PIN_2);
+  // Sensor 1 reading
+  bluetooth.print(F("DATA:Soil Sensor 1: "));
+  bluetooth.print(currentReading.moisture1);
+  if (currentReading.soil1Dry) {
+    bluetooth.println(F(" (DRY - NEEDS ATTENTION)"));
+  } else {
+    bluetooth.println(F(" (MOIST - OK)"));
+  }
+  
+  // Sensor 2 reading
+  bluetooth.print(F("DATA:Soil Sensor 2: "));
+  bluetooth.print(currentReading.moisture2);
+  if (currentReading.soil2Dry) {
+    bluetooth.println(F(" (DRY - NEEDS ATTENTION)"));
+  } else {
+    bluetooth.println(F(" (MOIST - OK)"));
+  }
+  
+  // Thresholds and uptime
+  bluetooth.print(F("DATA:Threshold 1: "));
+  bluetooth.println(config.soilThreshold1);
+  bluetooth.print(F("DATA:Threshold 2: "));
+  bluetooth.println(config.soilThreshold2);
+  bluetooth.print(F("DATA:System Uptime: "));
+  bluetooth.print(millis() / 1000);
+  bluetooth.println(F(" seconds"));
+}
+
+// ========================================================================
+// SEND SYSTEM STATISTICS
+// ========================================================================
+void sendSystemStatistics() {
+  bluetooth.println(F("DATA:=== SYSTEM STATISTICS ==="));
+  bluetooth.print(F("DATA:Total Readings: "));
+  bluetooth.println(totalReadings);
+  bluetooth.print(F("DATA:Reading Interval: "));
+  bluetooth.print(config.readingInterval / 1000);
+  bluetooth.println(F(" seconds"));
+  bluetooth.print(F("DATA:Alerts: "));
+  bluetooth.println(config.alertsEnabled ? F("ENABLED") : F("DISABLED"));
+  bluetooth.print(F("DATA:Data Stream: "));
+  bluetooth.println(config.dataStreamEnabled ? F("ENABLED") : F("DISABLED"));
+  bluetooth.print(F("DATA:System Uptime: "));
+  bluetooth.print(millis() / 1000);
+  bluetooth.println(F(" seconds"));
+  bluetooth.print(F("DATA:Free Memory: "));
+  bluetooth.print(getFreeMemory());
+  bluetooth.println(F(" bytes"));
+}
+
+// ========================================================================
+// TRANSMIT DATA STREAM
+// ========================================================================
+void transmitDataStream() {
+  bluetooth.println(F("STREAM:DATA_UPDATE"));
+  bluetooth.print(F("STREAM:"));
+  bluetooth.print(currentReading.moisture1);
+  bluetooth.print(F(","));
+  bluetooth.print(currentReading.moisture2);
+  bluetooth.print(F(","));
+  bluetooth.print(millis());
+  bluetooth.print(F(","));
+  bluetooth.print(currentReading.soil1Dry ? 1 : 0);
+  bluetooth.print(F(","));
+  bluetooth.println(currentReading.soil2Dry ? 1 : 0);
+}
+
+// ========================================================================
+// READ ALL SENSORS
+// ========================================================================
+void readSensors() {
+  // Store previous reading for comparison
+  previousReading = currentReading;
+  
+  // Read analog sensors (0-1023 range)
+  currentReading.moisture1 = analogRead(SOIL_SENSOR_1_PIN);
+  currentReading.moisture2 = analogRead(SOIL_SENSOR_2_PIN);
   currentReading.timestamp = millis();
   
-  // Determine status flags
-  currentReading.soil1Dry = currentReading.soilMoisture1 > config.soilDryThreshold1;
-  currentReading.soil2Dry = currentReading.soilMoisture2 > config.soilDryThreshold2;
+  // Determine dry/wet status (higher values = drier soil for capacitive sensors)
+  currentReading.soil1Dry = (currentReading.moisture1 > config.soilThreshold1);
+  currentReading.soil2Dry = (currentReading.moisture2 > config.soilThreshold2);
+  
+  // Add small delay for ADC settling
+  delay(10);
 }
 
+// ========================================================================
+// CHECK FOR ALERT CONDITIONS
+// ========================================================================
 void checkForAlerts() {
-  bool newAlert = false;
+  bool alertTriggered = false;
   
-  // Check for newly dry soil
-  if (!lastReading.soil1Dry && currentReading.soil1Dry) {
-    Serial.println("ALERT: Soil Sensor 1 is now DRY!");
+  // Check for newly dry conditions (state change from wet to dry)
+  if (!previousReading.soil1Dry && currentReading.soil1Dry) {
+    Serial.println(F("*** ALERT: Sensor 1 soil is now DRY! ***"));
     if (bluetoothConnected && config.alertsEnabled) {
-      bluetooth.println("ALERT: Soil Sensor 1 needs attention - reading: " + String(currentReading.soilMoisture1));
+      bluetooth.println(F("ALERT:Soil Sensor 1 needs attention!"));
+      bluetooth.print(F("ALERT:Reading: "));
+      bluetooth.print(currentReading.moisture1);
+      bluetooth.print(F(" (Threshold: "));
+      bluetooth.print(config.soilThreshold1);
+      bluetooth.println(F(")"));
     }
-    newAlert = true;
+    alertTriggered = true;
   }
   
-  if (!lastReading.soil2Dry && currentReading.soil2Dry) {
-    Serial.println("ALERT: Soil Sensor 2 is now DRY!");
+  if (!previousReading.soil2Dry && currentReading.soil2Dry) {
+    Serial.println(F("*** ALERT: Sensor 2 soil is now DRY! ***"));
     if (bluetoothConnected && config.alertsEnabled) {
-      bluetooth.println("ALERT: Soil Sensor 2 needs attention - reading: " + String(currentReading.soilMoisture2));
+      bluetooth.println(F("ALERT:Soil Sensor 2 needs attention!"));
+      bluetooth.print(F("ALERT:Reading: "));
+      bluetooth.print(currentReading.moisture2);
+      bluetooth.print(F(" (Threshold: "));
+      bluetooth.print(config.soilThreshold2);
+      bluetooth.println(F(")"));
     }
-    newAlert = true;
+    alertTriggered = true;
   }
   
-
-  
-  // Flash LED for new alerts
-  if (newAlert) {
+  // Flash LED rapidly for new alerts
+  if (alertTriggered) {
     for (int i = 0; i < 6; i++) {
-      digitalWrite(LED_PIN, HIGH);
+      digitalWrite(STATUS_LED_PIN, HIGH);
       delay(100);
-      digitalWrite(LED_PIN, LOW);
+      digitalWrite(STATUS_LED_PIN, LOW);
       delay(100);
     }
   }
 }
 
+// ========================================================================
+// LOG SENSOR DATA TO SERIAL MONITOR
+// ========================================================================
 void logSensorData() {
-  Serial.print("Reading #");
-  Serial.print(readingCount);
-  Serial.print(" - Soil1: ");
-  Serial.print(currentReading.soilMoisture1);
-  Serial.print(currentReading.soil1Dry ? " (DRY)" : " (WET)");
-  Serial.print(", Soil2: ");
-  Serial.print(currentReading.soilMoisture2);
-  Serial.println(currentReading.soil2Dry ? " (DRY)" : " (WET)");
+  Serial.print(F("Reading #"));
+  Serial.print(totalReadings + 1);
+  Serial.print(F(" | S1: "));
+  Serial.print(currentReading.moisture1);
+  Serial.print(currentReading.soil1Dry ? F(" (DRY)") : F(" (WET)"));
+  Serial.print(F(" | S2: "));
+  Serial.print(currentReading.moisture2);
+  Serial.print(currentReading.soil2Dry ? F(" (DRY)") : F(" (WET)"));
+  Serial.print(F(" | BT: "));
+  Serial.println(bluetoothConnected ? F("CONNECTED") : F("DISCONNECTED"));
 }
 
+// ========================================================================
+// UPDATE STATUS LED BASED ON SYSTEM STATE
+// ========================================================================
 void updateStatusLED() {
   if (bluetoothConnected) {
+    // Connected states
     if (currentReading.soil1Dry || currentReading.soil2Dry) {
-      // Fast blink for alerts when connected
-      digitalWrite(LED_PIN, (millis() / 200) % 2);
+      // Fast blink: Connected + Alert condition
+      digitalWrite(STATUS_LED_PIN, (millis() / 250) % 2);
     } else {
-      // Solid on when connected and all good
-      digitalWrite(LED_PIN, HIGH);
+      // Solid on: Connected + All sensors OK
+      digitalWrite(STATUS_LED_PIN, HIGH);
     }
   } else {
+    // Disconnected states
     if (currentReading.soil1Dry || currentReading.soil2Dry) {
-      // Medium blink for alerts when not connected
-      digitalWrite(LED_PIN, (millis() / 500) % 2);
+      // Medium blink: Disconnected + Alert condition
+      digitalWrite(STATUS_LED_PIN, (millis() / 500) % 2);
     } else {
-      // Slow blink when not connected but all good
-      digitalWrite(LED_PIN, (millis() / 1000) % 2);
+      // Slow blink: Disconnected + All sensors OK
+      digitalWrite(STATUS_LED_PIN, (millis() / 1000) % 2);
     }
   }
 }
+
+// ========================================================================
+// GET FREE MEMORY (USEFUL FOR DEBUGGING)
+// ========================================================================
+int getFreeMemory() {
+  extern int __heap_start, *__brkval;
+  int v;
+  return (int)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);
+}
+
+// ========================================================================
+// END OF SOIL MOISTURE MONITORING SYSTEM
+// ========================================================================
