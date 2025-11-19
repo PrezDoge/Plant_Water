@@ -1,18 +1,17 @@
 ##  **Plant Monitoring System with Bluetooth Interface**
 
-**UPDATED SCOPE: SENSORS AND DATA FOCUS - NO MOTOR CONTROL**
+**UPDATED SCOPE: SOIL SENSORS ONLY - NO MOTOR CONTROL**
 
-An intelligent Arduino-based plant monitoring system that uses dual soil moisture sensors and water level monitoring with Bluetooth data transmission for remote monitoring.
+An intelligent Arduino-based plant monitoring system that uses dual soil moisture sensors with Bluetooth data transmission for remote monitoring.
 
 ## Features
 
 - **Dual Soil Sensor Monitoring**: Two moisture sensors for comprehensive soil analysis
-- **Water Level Detection**: Monitor water source availability
 - **Real-time Data Collection**: Continuous sensor readings with configurable intervals
 - **Bluetooth Data Interface**: Wireless sensor data transmission to phone
 - **Smart Device Names**: Current sensor status displayed in Bluetooth device name
 - **No App Required**: Configure via native Bluetooth messaging
-- **Alert Notifications**: Automatic alerts for dry soil and low water conditions
+- **Alert Notifications**: Automatic alerts for dry soil conditions
 - **Data Logging**: Timestamped sensor readings and statistics
 - **Remote Configuration**: Adjust thresholds and settings via Bluetooth
 
@@ -32,10 +31,9 @@ An intelligent Arduino-based plant monitoring system that uses dual soil moistur
 
 ## Hardware Requirements
 
-### Core Components (NEW SCOPE - SENSORS ONLY)
+### Core Components (NEW SCOPE - SOIL SENSORS ONLY)
 - **SparkFun RedBoard (DEV-15025)** or Arduino Uno compatible
 - **Two DFRobot capacitive soil moisture sensors** 
-- **Water level sensor** (for monitoring water source)
 - **SparkFun Pro nRF52840 Mini Bluetooth Development Board**
 - **Breadboard and jumper wires**
 
@@ -45,13 +43,12 @@ An intelligent Arduino-based plant monitoring system that uses dual soil moistur
 - ~~DC Mini Motor~~
 - ~~Water pump and tubing~~
 
-### Pin Connections (SENSORS ONLY)
+### Pin Connections (SOIL SENSORS ONLY)
 
 | Component | RedBoard Pin | Notes |
 |-----------|-------------|-------|
 | Soil Moisture Sensor 1 | A0 | Analog input |
 | Soil Moisture Sensor 2 | A1 | Analog input |
-| Water Level Sensor | A2 | Analog input |
 | SparkFun nRF52840 (TX) | Pin 4 | SoftwareSerial |
 | SparkFun nRF52840 (RX) | Pin 5 | SoftwareSerial |
 | Status LED | Pin 13 | Built-in LED |

@@ -1,7 +1,7 @@
 /*
  * Sensor Calibration Test - DFRobot SEN0114
  * 
- * Use this sketch to calibrate your DFRobot moisture sensor (SEN0114) and water level sensor.
+ * Use this sketch to calibrate your DFRobot moisture sensor (SEN0114).
  * This will help you determine the appropriate threshold values for your main sketch.
  */
 
