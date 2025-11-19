@@ -1,55 +1,65 @@
-##  **Automated Plant Watering System with Bluetooth Interface**
+##  **Plant Monitoring System with Bluetooth Interface**
 
-An intelligent Arduino-based plant watering system that uses dual moisture sensors and native Bluetooth popup interface for monitoring and control.
+**UPDATED SCOPE: SENSORS AND DATA FOCUS - NO MOTOR CONTROL**
+
+An intelligent Arduino-based plant monitoring system that uses dual soil moisture sensors and water level monitoring with Bluetooth data transmission for remote monitoring.
+
 ## Features
 
-- **Dual Sensor Monitoring**: Two moisture sensors (3.3V and 5V) for redundancy
-- **H-Bridge Motor Control**: Professional motor control with DRV8871
-- **Bluetooth Popup Interface**: Native phone notifications and configuration popups
-- **Smart Device Names**: Status displayed in Bluetooth device name
+- **Dual Soil Sensor Monitoring**: Two moisture sensors for comprehensive soil analysis
+- **Water Level Detection**: Monitor water source availability
+- **Real-time Data Collection**: Continuous sensor readings with configurable intervals
+- **Bluetooth Data Interface**: Wireless sensor data transmission to phone
+- **Smart Device Names**: Current sensor status displayed in Bluetooth device name
 - **No App Required**: Configure via native Bluetooth messaging
-- **Real-time Notifications**: Automatic alerts for watering events
-- **Manual Override**: Physical button and Bluetooth controls
-- **Simple Menu System**: Number-based configuration interface
+- **Alert Notifications**: Automatic alerts for dry soil and low water conditions
+- **Data Logging**: Timestamped sensor readings and statistics
+- **Remote Configuration**: Adjust thresholds and settings via Bluetooth
 
 ##  Two Operation Modes
 
-### **Bluetooth Popup Interface**
-- **File**: `plant_water.ino`
-- **Interface**: Native phone Bluetooth popups and notifications
-- **Setup**: Pair with device, follow popup menus
-- **Features**: Smart device names, automatic notifications, simple configuration
+### **Sensor Monitoring Only (NEW SCOPE)**
+- **File**: `plant_monitor_sensors_only.ino`
+- **Interface**: Bluetooth data transmission and alerts
+- **Setup**: Pair with device, monitor sensor data
+- **Features**: Real-time monitoring, alerts, data logging, NO MOTOR CONTROL
 
-### **Basic Serial Mode**
-- **File**: `plant_water_basic.ino`
-- **Interface**: Arduino IDE Serial Monitor
-- **Setup**: Upload code and use serial commands
-- **Features**: Serial configuration, manual controls
+### **Legacy Full System (Original)**
+- **File**: `plant_water.ino`
+- **Interface**: Native phone Bluetooth popups with motor control
+- **Setup**: Full system with H-bridge and motor
+- **Features**: Complete watering automation (if motors are available)
 
 ## Hardware Requirements
 
-### Components
-- SparkFun RedBoard (DEV-15025) or Arduino Uno compatible
-- Two moisture sensors (3.3V and 5V versions)
-- DRV8871 H-Bridge motor driver (6.5V-45V, 3.6A capacity)
-- LM2596 Buck Converter (3V-40V input, 1.25V-35V output)
-- DC Mini Motor (1.5V-6V, 0.4A-0.55A capacity)
-- SparkFun Pro nRF52840 Mini Bluetooth Development Board
-- Breadboard and jumper wires  
-- Water reservoir and tubing
+### Core Components (NEW SCOPE - SENSORS ONLY)
+- **SparkFun RedBoard (DEV-15025)** or Arduino Uno compatible
+- **Two DFRobot capacitive soil moisture sensors** 
+- **Water level sensor** (for monitoring water source)
+- **SparkFun Pro nRF52840 Mini Bluetooth Development Board**
+- **Breadboard and jumper wires**
 
-### Pin Connections
+### ~~Removed Components~~ (Motor control cut from scope)
+- ~~DRV8871 H-Bridge motor driver~~
+- ~~LM2596 Buck Converter~~
+- ~~DC Mini Motor~~
+- ~~Water pump and tubing~~
+
+### Pin Connections (SENSORS ONLY)
 
 | Component | RedBoard Pin | Notes |
 |-----------|-------------|-------|
-| 3.3V Moisture Sensor | A0 | Analog input |
-| 5V Moisture Sensor | A1 | Analog input |
-| DRV8871 H-Bridge (IN1) | Pin 7 | Motor control |
-| DRV8871 H-Bridge (IN2) | Pin 8 | Motor control |
+| Soil Moisture Sensor 1 | A0 | Analog input |
+| Soil Moisture Sensor 2 | A1 | Analog input |
+| Water Level Sensor | A2 | Analog input |
 | SparkFun nRF52840 (TX) | Pin 4 | SoftwareSerial |
 | SparkFun nRF52840 (RX) | Pin 5 | SoftwareSerial |
-| Manual Override Button | Pin 2 | Digital input with pull-up |
 | Status LED | Pin 13 | Built-in LED |
+
+### ~~Removed Connections~~ (No longer needed)
+- ~~DRV8871 H-Bridge connections~~
+- ~~Motor control pins~~
+- ~~Manual override button~~
 
 ## Software Setup
 
